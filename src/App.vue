@@ -74,7 +74,61 @@ export default {
   mounted() {
     this.loadLessons();
   },
-  methods: {}
+  methods: {
+    lessonKey(lesson) {
+      return String(lesson._id);
+    },
+    imageUrl(lesson) {
+      const path = lesson.image || '';
+      if (path.startsWith('http')) return path;
+      const base = import.meta.env.VITE_API_BASE || '';
+      return `${base}${path}`;
+    },
+    loadLessons() {
+      this.loadingLessons = true;
+      this.loadError = '';
+      fetchLessons()
+        .then((data) => {
+          this.lessonList = data;
+        })
+        .catch((err) => {
+          this.loadError = err.message || 'Could not load lessons.';
+        })
+        .finally(() => {
+          this.loadingLessons = false;
+        });
+    },
+    onSearchInput() {
+      if (this.searchTimer) {
+        clearTimeout(this.searchTimer);
+      }
+      this.searchTimer = setTimeout(() => {
+        this.runSearch();
+      }, 350);
+    },
+    runSearch() {
+      this.loadingLessons = true;
+      this.loadError = '';
+      const q = this.searchQuery.trim();
+      const req = q === '' ? fetchLessons() : fetchSearch(q);
+      req
+        .then((data) => {
+          this.lessonList = data;
+        })
+        .catch((err) => {
+          this.loadError = err.message || 'Search failed.';
+        })
+        .finally(() => {
+          this.loadingLessons = false;
+        });
+    },
+    mergeLesson(updated) {
+      const id = String(updated._id);
+      this.lessonList = this.lessonList.map((l) =>
+        String(l._id) === id ? { ...l, ...updated } : l
+      );
+    }
+  }
 };
 </script>
 
