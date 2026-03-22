@@ -286,6 +286,48 @@ export default {
           </article>
         </div>
       </section>
+
+      <section v-show="view === 'cart'" class="panel">
+        <h2>Your cart</h2>
+        <p v-if="cart.length === 0" class="muted">Your cart is empty.</p>
+        <ul v-else class="cart-list">
+          <li v-for="(line, index) in cart" :key="`${line.lessonId}-${index}`" class="cart-row">
+            <img :src="imageUrl(line)" :alt="line.subject" class="thumb" />
+            <div>
+              <strong>{{ line.subject }}</strong>
+              <div class="muted small">{{ line.location }} · £{{ Number(line.price).toFixed(2) }}</div>
+            </div>
+            <button type="button" class="btn danger" @click="removeFromCart(index)">Remove</button>
+          </li>
+        </ul>
+
+        <div class="checkout">
+          <h3>Checkout</h3>
+          <div class="checkout-grid">
+            <label class="field">
+              <span>Name</span>
+              <input v-model="checkoutName" type="text" autocomplete="name" />
+              <span v-if="nameError" class="hint error">{{ nameError }}</span>
+            </label>
+            <label class="field">
+              <span>Phone</span>
+              <input v-model="checkoutPhone" type="tel" inputmode="numeric" autocomplete="tel" />
+              <span v-if="phoneError" class="hint error">{{ phoneError }}</span>
+            </label>
+          </div>
+          <button
+            type="button"
+            class="btn primary"
+            :disabled="!checkoutEnabled || cart.length === 0"
+            @click="submitCheckout"
+          >
+            Checkout
+          </button>
+          <p v-if="checkoutSuccess" class="banner success">
+            Thank you — your booking was received.
+          </p>
+        </div>
+      </section>
     </main>
   </div>
 </template>
