@@ -140,7 +140,7 @@ export default {
             subject: lesson.subject,
             location: lesson.location,
             price: lesson.price,
-            image: lesson.image
+            icon: lesson.icon
           });
         })
         .catch((err) => {
@@ -163,7 +163,6 @@ export default {
         });
     },
     toggleCartView() {
-      if (!this.cartButtonEnabled) return;
       this.view = this.view === 'lessons' ? 'cart' : 'lessons';
       if (this.view === 'lessons') {
         this.checkoutSuccess = false;
@@ -212,7 +211,7 @@ export default {
   <div class="app">
     <header class="header">
       <div class="brand">
-        <h1>After-School Lessons</h1>
+        <h1>After School Lessons</h1>
         <p class="tagline">Book activities for students</p>
       </div>
       <nav class="nav">
@@ -220,7 +219,6 @@ export default {
         <button
           type="button"
           class="btn primary"
-          :disabled="!cartButtonEnabled"
           @click="toggleCartView"
         >
           Cart ({{ cart.length }})
@@ -239,7 +237,7 @@ export default {
             <input
               v-model="searchQuery"
               type="search"
-              placeholder="Search as you type…"
+              placeholder="Find a lesson..."
               autocomplete="off"
               @input="onSearchInput"
             />
@@ -266,13 +264,13 @@ export default {
 
         <div class="grid">
           <article v-for="lesson in sortedLessons" :key="lessonKey(lesson)" class="card">
-            <div class="card-media">
-              <img :src="imageUrl(lesson)" :alt="lesson.subject" loading="lazy" />
+            <div class="card-icon">
+              <i :class="lesson.icon || 'fa-solid fa-book'"></i>
             </div>
             <div class="card-body">
               <h2>{{ lesson.subject }}</h2>
               <p class="meta">{{ lesson.location }}</p>
-              <p class="price">£{{ Number(lesson.price).toFixed(2) }}</p>
+              <p class="price">Rs {{ Number(lesson.price).toFixed(2) }}</p>
               <p class="spaces">{{ lesson.space }} spaces left</p>
               <button
                 type="button"
@@ -292,10 +290,10 @@ export default {
         <p v-if="cart.length === 0" class="muted">Your cart is empty.</p>
         <ul v-else class="cart-list">
           <li v-for="(line, index) in cart" :key="`${line.lessonId}-${index}`" class="cart-row">
-            <img :src="imageUrl(line)" :alt="line.subject" class="thumb" />
+            <span class="thumb-icon"><i :class="line.icon || 'fa-solid fa-book'"></i></span>
             <div>
               <strong>{{ line.subject }}</strong>
-              <div class="muted small">{{ line.location }} · £{{ Number(line.price).toFixed(2) }}</div>
+              <div class="muted small">{{ line.location }} · Rs {{ Number(line.price).toFixed(2) }}</div>
             </div>
             <button type="button" class="btn danger" @click="removeFromCart(index)">Remove</button>
           </li>
@@ -447,12 +445,14 @@ body {
   border: 1px solid var(--border);
 }
 
-.card-media img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: block;
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
   background: #e8eef5;
+  font-size: 2.8rem;
+  color: var(--accent);
 }
 
 .card-body {
@@ -533,12 +533,17 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.thumb {
+.thumb-icon {
   width: 56px;
   height: 56px;
-  object-fit: cover;
   border-radius: 8px;
   background: #e8eef5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .small {
