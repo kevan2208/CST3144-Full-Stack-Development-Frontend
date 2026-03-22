@@ -212,7 +212,7 @@ export default {
     <header class="header">
       <div class="brand">
         <h1>After School Lessons</h1>
-        <p class="tagline">Book activities for students</p>
+        <p class="tagline">Find the perfect lesson for you</p>
       </div>
       <nav class="nav">
         <button type="button" class="btn ghost" @click="goToLessons">Lessons</button>
@@ -270,7 +270,7 @@ export default {
             <div class="card-body">
               <h2>{{ lesson.subject }}</h2>
               <p class="meta">{{ lesson.location }}</p>
-              <p class="price">Rs {{ Number(lesson.price).toFixed(2) }}</p>
+              <p class="price">${{ Number(lesson.price).toFixed(2) }}</p>
               <p class="spaces">{{ lesson.space }} spaces left</p>
               <button
                 type="button"
@@ -293,7 +293,7 @@ export default {
             <span class="thumb-icon"><i :class="line.icon || 'fa-solid fa-book'"></i></span>
             <div>
               <strong>{{ line.subject }}</strong>
-              <div class="muted small">{{ line.location }} · Rs {{ Number(line.price).toFixed(2) }}</div>
+              <div class="muted small">{{ line.location }} · ${{ Number(line.price).toFixed(2) }}</div>
             </div>
             <button type="button" class="btn danger" @click="removeFromCart(index)">Remove</button>
           </li>
@@ -332,16 +332,17 @@ export default {
 
 <style>
 :root {
-  --bg: #f4f6fb;
+  --bg: #f5f7fa;
   --card: #ffffff;
-  --text: #1a2234;
-  --muted: #5c6478;
-  --border: #dde3f0;
-  --accent: #3a6ea5;
-  --accent-dark: #2c5582;
-  --danger: #c44536;
-  --radius: 12px;
-  --shadow: 0 8px 24px rgba(26, 34, 52, 0.08);
+  --text: #1c2d41;
+  --muted: #6b7c8f;
+  --border: #dfe5ec;
+  --accent: #0d9488;
+  --accent-dark: #0a7a70;
+  --accent-light: #ccfbf1;
+  --danger: #dc2626;
+  --radius: 10px;
+  --shadow: 0 4px 16px rgba(13, 148, 136, 0.08);
 }
 
 * {
@@ -376,6 +377,7 @@ body {
 .brand h1 {
   margin: 0;
   font-size: 1.35rem;
+  color: var(--accent);
 }
 
 .tagline {
@@ -427,6 +429,7 @@ body {
   border-radius: 8px;
   font-size: 1rem;
   background: #fff;
+  color: var(--text);
 }
 
 .grid {
@@ -450,7 +453,7 @@ body {
   align-items: center;
   justify-content: center;
   height: 120px;
-  background: #e8eef5;
+  background: var(--accent-light);
   font-size: 2.8rem;
   color: var(--accent);
 }
@@ -479,6 +482,7 @@ body {
   margin: 0;
   font-weight: 700;
   font-size: 1.05rem;
+  color: var(--accent-dark);
 }
 
 .btn {
@@ -487,8 +491,9 @@ body {
   padding: 0.55rem 0.9rem;
   font-size: 0.95rem;
   cursor: pointer;
-  background: #e8edf7;
-  color: var(--text);
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  transition: background 0.15s;
 }
 
 .btn:disabled {
@@ -499,6 +504,7 @@ body {
 .btn.primary {
   background: var(--accent);
   color: #fff;
+  font-weight: 600;
 }
 
 .btn.primary:hover:not(:disabled) {
@@ -508,6 +514,11 @@ body {
 .btn.ghost {
   background: transparent;
   border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn.ghost:hover {
+  background: var(--accent-light);
 }
 
 .btn.block {
@@ -515,8 +526,12 @@ body {
 }
 
 .btn.danger {
-  background: #fdecea;
+  background: #fef2f2;
   color: var(--danger);
+}
+
+.btn.danger:hover:not(:disabled) {
+  background: #fde8e8;
 }
 
 .cart-list {
@@ -537,7 +552,7 @@ body {
   width: 56px;
   height: 56px;
   border-radius: 8px;
-  background: #e8eef5;
+  background: var(--accent-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -573,13 +588,13 @@ body {
 }
 
 .banner.error {
-  background: #fdecea;
-  color: #7a1f15;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .banner.success {
-  background: #e8f5e9;
-  color: #1b5e20;
+  background: #ecfdf5;
+  color: #065f46;
 }
 
 .hint.error {
