@@ -210,6 +210,82 @@ export default {
 
 <template>
   <div class="app">
-    <p>App loading...</p>
+    <header class="header">
+      <div class="brand">
+        <h1>After-School Lessons</h1>
+        <p class="tagline">Book activities for students</p>
+      </div>
+      <nav class="nav">
+        <button type="button" class="btn ghost" @click="goToLessons">Lessons</button>
+        <button
+          type="button"
+          class="btn primary"
+          :disabled="!cartButtonEnabled"
+          @click="toggleCartView"
+        >
+          Cart ({{ cart.length }})
+        </button>
+      </nav>
+    </header>
+
+    <main class="main">
+      <p v-if="loadError" class="banner error">{{ loadError }}</p>
+      <p v-if="actionError" class="banner error">{{ actionError }}</p>
+
+      <section v-show="view === 'lessons'" class="panel">
+        <div class="toolbar">
+          <label class="field grow">
+            <span>Search</span>
+            <input
+              v-model="searchQuery"
+              type="search"
+              placeholder="Search as you type…"
+              autocomplete="off"
+              @input="onSearchInput"
+            />
+          </label>
+          <label class="field">
+            <span>Sort by</span>
+            <select v-model="sortField">
+              <option value="subject">Subject</option>
+              <option value="location">Location</option>
+              <option value="price">Price</option>
+              <option value="space">Spaces</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Order</span>
+            <select v-model="sortDir">
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </label>
+        </div>
+
+        <p v-if="loadingLessons" class="muted">Loading…</p>
+
+        <div class="grid">
+          <article v-for="lesson in sortedLessons" :key="lessonKey(lesson)" class="card">
+            <div class="card-media">
+              <img :src="imageUrl(lesson)" :alt="lesson.subject" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h2>{{ lesson.subject }}</h2>
+              <p class="meta">{{ lesson.location }}</p>
+              <p class="price">£{{ Number(lesson.price).toFixed(2) }}</p>
+              <p class="spaces">{{ lesson.space }} spaces left</p>
+              <button
+                type="button"
+                class="btn block"
+                :disabled="lesson.space <= 0"
+                @click="addToCart(lesson)"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
   </div>
 </template>
