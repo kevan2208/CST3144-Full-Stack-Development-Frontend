@@ -219,6 +219,7 @@ export default {
         <button
           type="button"
           class="btn primary"
+          :disabled="!cartButtonEnabled"
           @click="toggleCartView"
         >
           Cart ({{ cart.length }})
