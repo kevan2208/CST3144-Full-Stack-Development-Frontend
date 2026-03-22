@@ -127,6 +127,82 @@ export default {
       this.lessonList = this.lessonList.map((l) =>
         String(l._id) === id ? { ...l, ...updated } : l
       );
+    },
+    addToCart(lesson) {
+      if (lesson.space <= 0) return;
+      this.actionError = '';
+      const newSpace = lesson.space - 1;
+      updateLessonSpace(this.lessonKey(lesson), newSpace)
+        .then((updated) => {
+          this.mergeLesson(updated);
+          this.cart.push({
+            lessonId: this.lessonKey(lesson),
+            subject: lesson.subject,
+            location: lesson.location,
+            price: lesson.price,
+            image: lesson.image
+          });
+        })
+        .catch((err) => {
+          this.actionError = err.message || 'Could not update spaces.';
+        });
+    },
+    removeFromCart(index) {
+      const line = this.cart[index];
+      if (!line) return;
+      this.actionError = '';
+      const current = this.lessonList.find((l) => String(l._id) === line.lessonId);
+      const nextSpace = current ? current.space + 1 : 1;
+      updateLessonSpace(line.lessonId, nextSpace)
+        .then((updated) => {
+          this.mergeLesson(updated);
+          this.cart.splice(index, 1);
+        })
+        .catch((err) => {
+          this.actionError = err.message || 'Could not restore space.';
+        });
+    },
+    toggleCartView() {
+      if (!this.cartButtonEnabled) return;
+      this.view = this.view === 'lessons' ? 'cart' : 'lessons';
+      if (this.view === 'lessons') {
+        this.checkoutSuccess = false;
+      }
+    },
+    goToLessons() {
+      this.view = 'lessons';
+      this.checkoutSuccess = false;
+    },
+    submitCheckout() {
+      this.actionError = '';
+      this.checkoutSuccess = false;
+      if (!this.checkoutEnabled || this.cart.length === 0) return;
+      const lessonIds = this.cart.map((c) => c.lessonId);
+      const uniqueIds = [...new Set(lessonIds)];
+      postOrder({
+        name: this.checkoutName.trim(),
+        phone: this.checkoutPhone,
+        lessonIds
+      })
+        .then(() =>
+          Promise.all(
+            uniqueIds.map((id) => {
+              const lesson = this.lessonList.find((l) => String(l._id) === id);
+              const space = lesson ? lesson.space : 0;
+              return updateLessonSpace(id, space);
+            })
+          )
+        )
+        .then((updatedLessons) => {
+          updatedLessons.forEach((u) => this.mergeLesson(u));
+          this.checkoutSuccess = true;
+          this.cart = [];
+          this.checkoutName = '';
+          this.checkoutPhone = '';
+        })
+        .catch((err) => {
+          this.actionError = err.message || 'Checkout failed.';
+        });
     }
   }
 };
